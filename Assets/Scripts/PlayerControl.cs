@@ -4,10 +4,13 @@ using System.Collections;
 public class PlayerControl : MonoBehaviour {
     public float speed;
     private int count;
+    private float moveHorizontal;
+    private float moveVertical;
     public int health;
     public GUIText countText;
     public int power;
     public GUIText healthText;
+    private Vector3 movement;
 
     void Start()
     {
@@ -19,13 +22,26 @@ public class PlayerControl : MonoBehaviour {
     }
     void FixedUpdate()
     {
-        float moveHorizontal = Input.GetAxis("Horizontal");
-        float moveVertical = Input.GetAxis("Vertical");
-        Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
-        rigidbody.AddForce(movement * speed * Time.deltaTime);
+        
         
     }
 
+    void Update()
+    {
+        moveHorizontal = Input.GetAxis("Horizontal");
+        moveVertical = Input.GetAxis("Vertical");
+        movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
+        rigidbody.AddForce(movement * speed * Time.deltaTime);
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            rigidbody.velocity = new Vector3(0.0f, 3f, 0.0f) + movement;
+        }
+        if (Input.GetKeyUp(KeyCode.Space))
+        {
+            rigidbody.velocity = new Vector3(0.0f, 0.0f, 0.0f);
+        }        
+    }
     void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "PickUp")
@@ -35,7 +51,10 @@ public class PlayerControl : MonoBehaviour {
             setCountText();
             power += 2;
         }
-
+        if (other.gameObject.tag == "Trampoline")
+        {
+            rigidbody.velocity = movement + new Vector3(0.0f, 10f, 0.0f);
+        }
         
         
     }
@@ -50,7 +69,6 @@ public class PlayerControl : MonoBehaviour {
             {
                 enemy.healthText.text = " ";
                 enemy.gameObject.SetActive(false);
-                
             }
         }
     }
